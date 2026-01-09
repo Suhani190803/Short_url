@@ -15,6 +15,7 @@ app.set("view engine" , "ejs");
 app.set("views" , path.resolve("./views"));
 
 app.use(express.json());
+app.use(express.urlencoded({extended : false}));
 
 app.get("/test",async(req,res)=>{
     const allUrls = await URL.find({});
@@ -22,8 +23,9 @@ app.get("/test",async(req,res)=>{
         urls: allUrls,
     });
 })
-app.use("/url" , urlRoute);
 app.use("/" , staticRoute);
+app.use("/url" , urlRoute);
+
 app.get('/:shortId',async (req,res)=>{
   const shortId= req.params.shortId;
   const entry =await URL.findOneAndUpdate({
@@ -33,7 +35,11 @@ app.get('/:shortId',async (req,res)=>{
     {
     visitHistory : {
         timestamp:Date.now()}
-  }});
+  }},{ new: true });
+  if (!entry) {
+    return res.status(404).send("Short URL not found");
+  }
   res.redirect(entry.redirectURL)
 })
+
 app.listen(PORT,()=> console.log(`Server Started at PORT:${PORT}`))

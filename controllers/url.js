@@ -12,7 +12,12 @@ async function handlegenerateNewShortURL(req,res){
     visitHistory : [],
 
 });
-return res.json({id: shortID})   //Client ko response
+const allUrls = await URL.find({});
+return res.render('home', {
+    id : shortID ,
+    urls: allUrls   //Client ko response
+})
+   
 
 }
 async function handleGetAnalytics(req,res){
